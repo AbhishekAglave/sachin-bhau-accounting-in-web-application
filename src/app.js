@@ -8,12 +8,10 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const cors = require("cors");
-const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const passport = require("passport");
 
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
+const UserController = require("./controllers/UserController");
 
 const fetch = require("cross-fetch");
 
@@ -22,6 +20,9 @@ const app = express();
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public/frontend")));
 
 app.use(
   cors({
@@ -45,6 +46,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./models/authenticate")(passport);
 
+app.post("/api/signup", UserController.createUser);
+
 app.post("/api/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) throw err;
@@ -61,17 +64,9 @@ app.post("/api/login", (req, res, next) => {
 app.post("/api/logout", (req, res) => {
   req.logout((err) => {
     if (err) return err;
-    res.redirect("/");
+    res.redirect("/login");
   });
 });
-
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "public/frontend")));
-
-app.use("/", indexRouter);
-app.use("/api", usersRouter);
-
-
 
 app.get("/verify", async (req, res, next) => {
   console.log(req.headers.token);
@@ -93,6 +88,8 @@ app.get("/verify", async (req, res, next) => {
       res.send(error);
     });
 });
+
+
 
 app.get("*", (req, res) => {
   res.sendFile(__dirname + "/public/frontend/index.html");
