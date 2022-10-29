@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import ReceiptsTable from "./receipts/ReceiptsTable";
 import ReceiptsForm from "./receipts/ReceiptsForm";
 
+
 function Router() {
   return (
     <Routes>

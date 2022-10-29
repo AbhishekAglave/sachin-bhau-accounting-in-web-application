@@ -22,11 +22,14 @@ import MenuIcon from "@material-ui/icons/Menu";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { NavLink } from "react-router-dom";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
+import { Routes, Route } from "react-router-dom";
 
 import { blue } from "@material-ui/core/colors";
 
 import Router from "./components/Router";
 import { Avatar } from "@material-ui/core";
+import SignIn from "./components/signInAndSignUp/SignIn";
+import SignUp from "./components/signInAndSignUp/SignUp";
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -162,66 +165,77 @@ function App() {
   );
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          {isScreenSmall ? (
-            <IconButton
-              onClick={toggleDrawer("left", !state["left"])}
-              edge="start"
-              className={classes.menuButton}
-              color="inherit"
-              aria-label="menu"
-            >
-              <MenuIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              edge="start"
-              className={classes.menuButton}
-              color="inherit"
-              aria-label="menu"
-            >
-              <Avatar className={classes.icon}>
-                <AccountBalanceWalletIcon />
-              </Avatar>
-            </IconButton>
-          )}
-          <Typography variant="h6" className={classes.title}>
-            Accounting In
-          </Typography>
-          <Button color="inherit">Login</Button>
-        </Toolbar>
-      </AppBar>
-      {isScreenSmall ? (
-        <SwipeableDrawer
-          anchor={"left"}
-          open={state["left"]}
-          onClose={toggleDrawer("left", false)}
-          onOpen={toggleDrawer("left", true)}
-        >
-          {list("left")}
-        </SwipeableDrawer>
-      ) : (
-        <Drawer
-          className={classes.drawer}
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper
-          }}
-        >
-          <Toolbar />
-          {drawerItems()}
-          <Divider />
-        </Drawer>
-      )}
+    <Routes>
+      <Route
+        index
+        element={
+          <div className={classes.root}>
+            <CssBaseline />
+            <AppBar position="fixed" className={classes.appBar}>
+              <Toolbar>
+                {isScreenSmall ? (
+                  <IconButton
+                    onClick={toggleDrawer("left", !state["left"])}
+                    edge="start"
+                    className={classes.menuButton}
+                    color="inherit"
+                    aria-label="menu"
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    edge="start"
+                    className={classes.menuButton}
+                    color="inherit"
+                    aria-label="menu"
+                  >
+                    <Avatar className={classes.icon}>
+                      <AccountBalanceWalletIcon />
+                    </Avatar>
+                  </IconButton>
+                )}
+                <Typography variant="h6" className={classes.title}>
+                  Accounting In
+                </Typography>
+                <Button color="inherit">Login</Button>
+              </Toolbar>
+            </AppBar>
+            {isScreenSmall ? (
+              <SwipeableDrawer
+                anchor={"left"}
+                open={state["left"]}
+                onClose={toggleDrawer("left", false)}
+                onOpen={toggleDrawer("left", true)}
+              >
+                {list("left")}
+              </SwipeableDrawer>
+            ) : (
+              <Drawer
+                className={classes.drawer}
+                variant="permanent"
+                classes={{
+                  paper: classes.drawerPaper
+                }}
+              >
+                <Toolbar />
+                {drawerItems()}
+                <Divider />
+              </Drawer>
+            )}
 
-      <main className={classes.content}>
-        <Toolbar />
-        <Router />
-      </main>
-    </div>
+            <main className={classes.content}>
+              <Toolbar />
+              <Router />
+            </main>
+          </div>
+        }
+      ></Route>
+
+      <Route path="signin" element={<SignIn />}></Route>
+
+      <Route path="signup" element={<SignUp />}></Route>
+    </Routes>
   );
 }
 
