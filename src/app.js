@@ -46,6 +46,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./models/authenticate")(passport);
 
+app.get("/api/auth", (req, res, next)=>{
+  if(req.isAuthenticated()){
+    res.send({message:"User authenticated successfully", user: req.user})
+  }else{
+    res.status(403)
+    res.send({message:"Access forbidden, user authentication failed"})
+  }
+})
+
 app.post("/api/signup", UserController.createUser);
 
 app.post("/api/login", (req, res, next) => {
@@ -61,10 +70,10 @@ app.post("/api/login", (req, res, next) => {
   })(req, res, next);
 });
 
-app.post("/api/logout", (req, res) => {
+app.get("/api/logout", (req, res) => {
   req.logout((err) => {
     if (err) return err;
-    res.redirect("/login");
+    res.send({ message: "Logged out successfully" });
   });
 });
 
@@ -88,8 +97,6 @@ app.get("/verify", async (req, res, next) => {
       res.send(error);
     });
 });
-
-
 
 app.get("*", (req, res) => {
   res.sendFile(__dirname + "/public/frontend/index.html");
