@@ -167,7 +167,7 @@ function App() {
   return (
     <Routes>
       <Route
-        index
+        path={"/*"}
         element={
           <div className={classes.root}>
             <CssBaseline />
