@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
@@ -20,16 +20,11 @@ import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { NavLink } from "react-router-dom";
-import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
-import { Routes, Route } from "react-router-dom";
-
-import { blue } from "@material-ui/core/colors";
-
+import { useNavigate, NavLink } from "react-router-dom";
+import LibraryBooksOutlinedIcon from "@material-ui/icons/LibraryBooksOutlined";
 import Router from "./components/Router";
 import { Avatar } from "@material-ui/core";
-import SignIn from "./components/signInAndSignUp/SignIn";
-import SignUp from "./components/signInAndSignUp/SignUp";
+import apis from "./apis";
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -70,8 +65,7 @@ const useStyles = makeStyles((theme) => {
     icon: {
       width: theme.spacing(4),
       height: theme.spacing(4),
-      color: theme.palette.getContrastText(blue[200]),
-      backgroundColor: blue[200]
+      backgroundColor: "inherit"
     }
   };
 });
@@ -79,10 +73,40 @@ const useStyles = makeStyles((theme) => {
 function App() {
   const isScreenSmall = useMediaQuery("(max-width:1024px)");
   const [selectedNavLink, setSelectedNavLink] = useState("");
+  const [greeting, setGreeting] = useState("");
   const classes = useStyles();
+  const navigate = useNavigate();
   const [state, setState] = useState({
     left: false
   });
+
+  const myDate = new Date();
+  const hrs = myDate.getHours();
+
+  useEffect(() => {
+    const authenticate = async () => {
+      try {
+        const res = await fetch("/api/auth");
+        if (!res.ok) {
+          navigate("/signin");
+        } else if (res.ok) {
+          const jsonRes = await res.json();
+          greet(jsonRes.user);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    authenticate();
+  });
+
+  const greet = (user) => {
+    if (hrs < 12) setGreeting(`Good Morning, ${user.username}`);
+    else if (hrs >= 12 && hrs <= 17)
+      setGreeting(`Good Afternoon, ${user.username}`);
+    else if (hrs >= 17 && hrs <= 24)
+      setGreeting(`Good Evening, ${user.username}`);
+  };
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -165,77 +189,85 @@ function App() {
   );
 
   return (
-    <Routes>
-      <Route
-        path={"/*"}
-        element={
-          <div className={classes.root}>
-            <CssBaseline />
-            <AppBar position="fixed" className={classes.appBar}>
-              <Toolbar>
-                {isScreenSmall ? (
-                  <IconButton
-                    onClick={toggleDrawer("left", !state["left"])}
-                    edge="start"
-                    className={classes.menuButton}
-                    color="inherit"
-                    aria-label="menu"
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                ) : (
-                  <IconButton
-                    edge="start"
-                    className={classes.menuButton}
-                    color="inherit"
-                    aria-label="menu"
-                  >
-                    <Avatar className={classes.icon}>
-                      <AccountBalanceWalletIcon />
-                    </Avatar>
-                  </IconButton>
-                )}
-                <Typography variant="h6" className={classes.title}>
-                  Accounting In
-                </Typography>
-                <Button color="inherit">Login</Button>
-              </Toolbar>
-            </AppBar>
-            {isScreenSmall ? (
-              <SwipeableDrawer
-                anchor={"left"}
-                open={state["left"]}
-                onClose={toggleDrawer("left", false)}
-                onOpen={toggleDrawer("left", true)}
-              >
-                {list("left")}
-              </SwipeableDrawer>
-            ) : (
-              <Drawer
-                className={classes.drawer}
-                variant="permanent"
-                classes={{
-                  paper: classes.drawerPaper
-                }}
-              >
-                <Toolbar />
-                {drawerItems()}
-                <Divider />
-              </Drawer>
-            )}
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar position="fixed" className={classes.appBar}>
+        <Toolbar>
+          {isScreenSmall ? (
+            <IconButton
+              onClick={toggleDrawer("left", !state["left"])}
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+            >
+              <Avatar className={classes.icon}>
+                <LibraryBooksOutlinedIcon />
+              </Avatar>
+            </IconButton>
+          )}
+          <Typography variant="h6" className={classes.title}>
+            Accounting In
+          </Typography>
 
-            <main className={classes.content}>
-              <Toolbar />
-              <Router />
-            </main>
-          </div>
-        }
-      ></Route>
+          {!isScreenSmall ? (
+            <Typography variant="subtitle1">
+              <div style={{ margin: "0px 20px" }}>{greeting}</div>
+            </Typography>
+          ) : null}
+          <Button
+            onClick={() => {
+              fetch(apis.auth.logout).then((res) => {
+                if (res.ok) {
+                  navigate("/signin");
+                }
+              });
+            }}
+            variant="contained"
+            color="default"
+            size="small"
+          >
+            Log Out
+          </Button>
+        </Toolbar>
+      </AppBar>
+      {isScreenSmall ? (
+        <SwipeableDrawer
+          anchor={"left"}
+          open={state["left"]}
+          onClose={toggleDrawer("left", false)}
+          onOpen={toggleDrawer("left", true)}
+        >
+          {list("left")}
+        </SwipeableDrawer>
+      ) : (
+        <Drawer
+          className={classes.drawer}
+          variant="permanent"
+          classes={{
+            paper: classes.drawerPaper
+          }}
+        >
+          <Toolbar />
+          {drawerItems()}
+          <Divider />
+        </Drawer>
+      )}
 
-      <Route path="signin" element={<SignIn />}></Route>
-
-      <Route path="signup" element={<SignUp />}></Route>
-    </Routes>
+      <main className={classes.content}>
+        <Toolbar />
+        <Router />
+      </main>
+    </div>
   );
 }
 
