@@ -46,21 +46,24 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./models/authenticate")(passport);
 
-app.get("/api/auth", (req, res, next)=>{
-  if(req.isAuthenticated()){
-    res.send({message:"User authenticated successfully", user: req.user})
-  }else{
-    res.status(403)
-    res.send({message:"Access forbidden, user authentication failed"})
+app.get("/api/auth", (req, res, next) => {
+  if (req.isAuthenticated()) {
+    res.send({ message: "User authenticated successfully", user: req.user });
+  } else {
+    res.status(403);
+    res.send({ message: "Access forbidden, user authentication failed" });
   }
-})
+});
 
 app.post("/api/signup", UserController.createUser);
 
 app.post("/api/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) throw err;
-    if (!user) res.send(info);
+    if (!user) {
+      res.status(403)
+      res.send(info);
+    }
     if (user) {
       req.login(user, (err) => {
         if (err) throw err;

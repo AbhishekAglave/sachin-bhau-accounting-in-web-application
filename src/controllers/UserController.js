@@ -17,15 +17,25 @@ const createUser = async (req, res) => {
     return usernameRegex.test(val);
   };
 
+  const adminKeys = ["0987", "sachinbhau", "admin"];
+
   if (onValidUsername(req.body.username)) {
     if (req.body.password) {
-      try {
-        const newUser = await User.createUser(req.body);
-        res.status(201);
-        res.send({ message: "User created successfully" });
-      } catch (error) {
+      if (adminKeys.includes(req.body.adminkey)) {
+        try {
+          const newUser = await User.createUser({
+            username: req.body.username,
+            password: req.body.password
+          });
+          res.status(201);
+          res.send({ message: "User created successfully" });
+        } catch (error) {
+          res.status(400);
+          res.send(error);
+        }
+      } else {
         res.status(400);
-        res.send(error);
+        res.send({ message: "Please enter valid admin key" });
       }
     } else {
       res.status(400);
