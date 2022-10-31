@@ -15,7 +15,7 @@ import apis from "../../apis";
 const theme = createTheme();
 
 export default function SignUp() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState("Note : only admins can create new user");
   const navigate = useNavigate();
 
   const handleSubmit = (event) => {
@@ -23,7 +23,8 @@ export default function SignUp() {
     const data = new FormData(event.currentTarget);
     const formData = {
       username: data.get("username"),
-      password: data.get("password")
+      password: data.get("password"),
+      adminkey: data.get("adminkey")
     };
     signUp(formData);
   };
@@ -92,6 +93,16 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="adminkey"
+                  label="Admin Key"
+                  type="password"
+                  id="adminkey"
                 />
               </Grid>
               <Grid item xs={12}>

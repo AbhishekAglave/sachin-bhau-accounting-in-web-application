@@ -84,6 +84,7 @@ function App() {
   const hrs = myDate.getHours();
 
   useEffect(() => {
+    
     const authenticate = async () => {
       try {
         const res = await fetch("/api/auth");

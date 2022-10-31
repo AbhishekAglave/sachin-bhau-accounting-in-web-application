@@ -39,7 +39,7 @@ export default function SignIn() {
         },
         body: JSON.stringify(formData)
       });
-      if (apiRes.status === 200) {
+      if (apiRes.ok) {
         navigate("/");
       } else {
         const response = await apiRes.json();
@@ -108,14 +108,7 @@ export default function SignIn() {
             >
               Sign In
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Typography variant="body2">
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Typography>
-              </Grid>
+            <Grid container justifyContent="flex-end">
               <Grid item>
                 <Typography variant="body2">
                   <Link to="../signup">{"Don't have an account? Sign Up"}</Link>
